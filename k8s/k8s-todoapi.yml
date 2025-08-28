@@ -1,0 +1,85 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: todoapi
+  labels:
+    app.kubernetes.io/name: todoapi
+    app.kubernetes.io/part-of: todo
+spec:
+  replicas: 2
+  revisionHistoryLimit: 5
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 0
+      maxSurge: 1
+  selector:
+    matchLabels:
+      app: todoapi
+  template:
+    metadata:
+      labels:
+        app: todoapi
+        app.kubernetes.io/name: todoapi
+    spec:
+      terminationGracePeriodSeconds: 30
+      containers:
+        - name: api
+          image: todoapi:5
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8080
+          # Health probes
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 2
+            periodSeconds: 5
+            failureThreshold: 3
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            failureThreshold: 3
+          # Graceful shutdown for web apps
+          lifecycle:
+            preStop:
+              exec:
+                command: ["/bin/sh","-c","sleep 5"]
+          # Resources (tune as needed)
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "256Mi"
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
+          # Config via env vars
+          env:
+            - name: APP_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: todoapi-config
+                  key: APP_NAME
+            - name: API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: todoapi-secrets
+                  key: API_KEY
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: todoapi
+  labels:
+    app: todoapi
+spec:
+  selector:
+    app: todoapi
+  ports:
+    - port: 80
+      targetPort: 8080
+  type: NodePort

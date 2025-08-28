@@ -1,0 +1,56 @@
+replicaCount: 2
+
+image:
+  repository: todoapi
+  tag: "4"                    # change this per release
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP             # use NodePort if you’re not using Ingress
+  port: 80
+  targetPort: 8080
+
+ingress:
+  enabled: true
+  className: nginx
+  host: todo.localtest.me
+  annotations: {}
+  path: /
+  pathType: Prefix
+
+resources:
+  requests:
+    cpu: "100m"
+    memory: "256Mi"
+  limits:
+    cpu: "500m"
+    memory: "512Mi"
+
+config:
+  APP_NAME: "Todo API (Helm)"
+secret:
+  API_KEY: "super-secret-value"
+
+probes:
+  readiness:
+    path: /health
+    initialDelaySeconds: 2
+    periodSeconds: 5
+  liveness:
+    path: /health
+    initialDelaySeconds: 10
+    periodSeconds: 10
+
+rollingUpdate:
+  maxUnavailable: 0
+  maxSurge: 1
+
+pdb:
+  enabled: true
+  minAvailable: 1
+
+hpa:
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 6
+  targetCPUUtilizationPercentage: 30

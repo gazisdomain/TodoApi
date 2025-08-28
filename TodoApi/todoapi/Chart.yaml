@@ -1,0 +1,6 @@
+apiVersion: v2
+name: todoapi
+description: A simple ASP.NET Core Todo API
+type: application
+version: 0.1.0         # chart version
+appVersion: "1.0.0"    # your app version (informational)

@@ -1,6 +1,6 @@
 # TodoApi
 
-[![CI](https://github.com/gazisdomain/TodoApi/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/gazisdomain/TodoApi/actions/workflows/ci.yml)
+[![CI](https://github.com/gazisdomain/TodoApi/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/gazisdomain/TodoApi/actions/workflows/ci.yml)
 
 
 A sample **ASP.NET Core Web API** (minimal APIs) demonstrating how to containerize a .NET app with **Docker**, and deploy it to **Kubernetes** using **Helm**.  
